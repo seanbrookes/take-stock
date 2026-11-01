@@ -1,0 +1,290 @@
+:root {
+  --text: #6b6375;
+  --text-h: #08060d;
+  --bg: #fff;
+  --bg-soft: #faf9f7;
+  --row-hover: #f0edf7;
+  --border: #e5e4e7;
+  --code-bg: #f4f3ec;
+  --accent: #aa3bff;
+  --accent-bg: rgba(170, 59, 255, 0.1);
+  --accent-border: rgba(170, 59, 255, 0.5);
+  --pos: #0f7a4d;
+  --neg: #c0392b;
+  --shadow:
+    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+
+  font: 15px/145% var(--sans);
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #9ca3af;
+    --text-h: #f3f4f6;
+    --bg: #16171d;
+    --bg-soft: #1b1c23;
+    --row-hover: #272832;
+    --border: #2e303a;
+    --code-bg: #1f2028;
+    --accent: #c084fc;
+    --accent-bg: rgba(192, 132, 252, 0.15);
+    --accent-border: rgba(192, 132, 252, 0.5);
+    --pos: #4ade80;
+    --neg: #f87171;
+    --shadow:
+      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+  }
+}
+
+body {
+  margin: 0;
+}
+
+#app {
+  min-height: 100svh;
+}
+
+/* Reading width by default. Data-dense views opt into `wide` — a ten-column
+   table has no business being squeezed into prose width on a large display. */
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 20px 80px;
+  box-sizing: border-box;
+}
+.page.wide {
+  max-width: min(1680px, 100vw - 40px);
+}
+
+h1,
+h2,
+h3 {
+  color: var(--text-h);
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+h1 {
+  font-size: 28px;
+}
+h2 {
+  font-size: 19px;
+}
+h3 {
+  font-size: 15px;
+}
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  color: var(--text-h);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 12px;
+  transition: border-color 0.15s;
+}
+button:hover:not(:disabled) {
+  border-color: var(--accent-border);
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+button.primary {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
+input,
+select {
+  font: inherit;
+  color: var(--text-h);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  box-sizing: border-box;
+}
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+code,
+.mono {
+  font-family: var(--mono);
+  font-size: 0.92em;
+}
+
+/* --- numeric data ------------------------------------------------------- */
+
+.num {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+  color: var(--text-h);
+}
+.pos {
+  color: var(--pos);
+}
+.neg {
+  color: var(--neg);
+}
+.muted {
+  color: var(--text);
+  opacity: 0.75;
+}
+
+/* --- tables ------------------------------------------------------------- */
+
+.table-scroll {
+  /* Scrolls in both axes, and that is deliberate.
+     `overflow-x: auto` already makes this a scroll container on both axes, so a
+     sticky <thead> anchors here rather than to the viewport. Without a height
+     limit that box is as tall as its content, so the header never actually
+     sticks. Capping the height to the window turns the table into its own
+     scrollport: the header pins to the top of it, and horizontal scrolling
+     still works. Pure CSS cannot give both viewport-sticky headers and
+     horizontal scrolling — this is the trade that keeps the header. */
+  overflow: auto;
+  /* Never collapse below a usable height on a short window or a laptop with a
+     lot of browser chrome. */
+  max-height: max(320px, var(--table-max, calc(100svh - 220px)));
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  /* Stops the scrollbar chaining to the page once the table hits its end. */
+  overscroll-behavior: contain;
+}
+
+/* Short tables should not grow a scroll area they do not need. */
+.table-scroll.auto-height {
+  max-height: none;
+}
+
+table {
+  border-collapse: collapse;
+  font-size: 14px;
+  /* THE contract that makes .table-scroll work.
+     `width: 100%` alone caps the table at the container, so it can never
+     overflow — the browser squeezes columns under their content width and
+     nowrap text spills out and is clipped, with nothing to scroll. Pairing it
+     with `min-width: max-content` means: fill the container when the content
+     is narrow, otherwise grow to fit and let the wrapper scroll. */
+  width: 100%;
+  min-width: max-content;
+}
+th,
+td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+thead th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-soft);
+  color: var(--text-h);
+  font-weight: 600;
+  font-size: 13px;
+  z-index: 2;
+  /* The header sits over scrolling rows, so it needs an opaque edge of its own —
+     border-collapse drops the cell's own border once it is sticky. */
+  box-shadow: inset 0 -1px 0 var(--border);
+}
+tbody tr:last-child td {
+  border-bottom: none;
+}
+tbody tr:hover {
+  background: var(--row-hover);
+}
+
+/* --- frozen action column -------------------------------------------------
+   A data table with a dozen columns is legitimately wider than the page, so it
+   scrolls. But the row's controls must not be the thing that scrolls out of
+   reach — needing to scroll sideways before you can click "Details" is the
+   worst possible column to lose. Pinning it to the right keeps the table honest
+   about its width while keeping the controls where the eye already is.
+
+   Cells need an opaque background of their own: rows underneath scroll beneath
+   them, and the row's own background does not paint a sticky cell. */
+.actions-cell {
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  background: var(--bg);
+  box-shadow: inset 1px 0 0 var(--border);
+}
+thead .actions-cell {
+  background: var(--bg-soft);
+  z-index: 3; /* above the sticky header row (2) */
+}
+tbody tr:hover .actions-cell {
+  background: var(--row-hover);
+}
+tbody tr.open .actions-cell {
+  background: var(--bg-soft);
+}
+
+/* --- layout primitives -------------------------------------------------- */
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--bg);
+}
+
+.grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--code-bg);
+  color: var(--text-h);
+}
